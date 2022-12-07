@@ -5,13 +5,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-"""
-GENETIC ALGORITHM PROCESS:
-**Knapsack problem genetic algorithm approach**
-Goal :
-    - Fill the knapsack with the highest value while being less than the maximum capacity'
-    - 
-"""
+from problems import *
 
 
 class Genetic:
@@ -53,7 +47,7 @@ class Genetic:
             initial_fitnesses = [(idx, self.fittness([individual])) for idx, individual in enumerate(self.population)]
             initial_fitnesses = sorted(initial_fitnesses, key=operator.itemgetter(1), reverse=True)
             most_fit = initial_fitnesses[0][1]
-            print(f"Most fit: {most_fit}")
+            # print(f"Most fit: {most_fit}")
             fitnesses.append(most_fit)
             # print(most_fit)
             # print(fitnesses_)
@@ -101,7 +95,9 @@ class Genetic:
 
         new_pop_fitness = [(self.fittness([individual]), individual) for individual in self.population]
         new_pop_fitness = sorted(new_pop_fitness, key=operator.itemgetter(0), reverse=True)
-        print(f"Best Solution: {new_pop_fitness[0]}")
+        #print(f"Best Solution: {new_pop_fitness[1]}")
+        self.best_combination = new_pop_fitness[0][1]
+        self.best_value = np.dot(self.best_combination, self.profits)
 
         plt.grid()
         plt.plot(fitnesses)
@@ -159,21 +155,12 @@ class Genetic:
     def get_pop(self):
         return self.population
 
-data = [{""}]
+# data = {"problem1" : {"weights": ,}}
+
 if __name__ == "__main__":
-    # gen = Genetic([1, 1, 1, 1, 32, 23433, 433324, 21, 4, 2234, 10, 3434, 342, 4, 23, 21],
-    #               [1, 1, 1, 12, 4, 323, 232, 2334, 322, 2, 32, 242, 132, 23, 2314, 23], 102)
-    gen = Genetic([23, 31, 29, 44, 53, 38, 63, 85, 89, 82], [92, 57, 49, 68, 60, 43, 67, 84, 87, 72], capacity=165)
-    # print(f"Gen Pop before loop: {gen.population}")
-    # print(gen.population)
-    # print(gen.fittness(gen.population))
-    # print(random.uniform(0, 1))
-    # print(random.random())
-    gen.loop(2000)
-
-    # final_pop = [(idx, gen.fittness[individual]) for idx, individual in enumerate(gen.get_pop())]
-    # final_pop = sorted(final_pop, key=operator.itemgetter(1), reverse=True)
-    # print(final_pop)
-    # print(gen.get_pop())
-
-    # print(f"Gen pop after loop: {gen.population}")
+    gen = Genetic(p8["weights"], p8["profits"], capacity=p8["capacity"])
+    gen.loop(100000)
+    print(f"Best Solution: {gen.best_combination}, Best Value: {gen.best_value}")
+    # print("hELLO WRD")
+    print(f"Actual Solution: {p8['optimal']}, Actual Value: {p8['best']}")
+    # print(problems)
