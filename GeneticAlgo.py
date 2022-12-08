@@ -9,8 +9,9 @@ from problems import *
 
 
 class Genetic:
-    def __init__(self, weights: list, profits: list, capacity: int):
-        # print(f"Weight len:{len(weights)}, prof len: {len(profits)}")
+    def __init__(self, weights: list, profits: list, capacity: int) -> None:
+        self.best_value = None
+        self.best_combination = None
         assert len(weights) == len(profits), "The there should be just as many weights as there are profits"
         self.capacity = capacity
         self.weights = weights
@@ -20,26 +21,20 @@ class Genetic:
         for i in range(100):
             self.population.append(np.random.randint(0, 2, len(profits)).tolist())
 
-        # self.clean_up(self.population)
-
     def fittness(self, population: list) -> int:
-        fitnesses = []
-        fitness = sum(fitnesses)
         fits = 0
 
         for gene in population:
             total_profit = np.dot(gene, self.profits)
             total_weight = np.dot(gene, self.weights)
 
-            # fitnesses.append(total_profit+1 if total_weight < self.capacity else 2)
-            # fits += total_profit if total_weight < self.capacity else 0
             if total_weight <= self.capacity:
                 fits += total_profit
             else:
                 fits += 0
         return fits
 
-    def loop(self, generations: int) -> tuple:
+    def loop(self, generations: int) -> list:
         # Random Selection
         fitnesses = []
         for i in range(generations):
@@ -47,10 +42,7 @@ class Genetic:
             initial_fitnesses = [(idx, self.fittness([individual])) for idx, individual in enumerate(self.population)]
             initial_fitnesses = sorted(initial_fitnesses, key=operator.itemgetter(1), reverse=True)
             most_fit = initial_fitnesses[0][1]
-            # print(f"Most fit: {most_fit}")
             fitnesses.append(most_fit)
-            # print(most_fit)
-            # print(fitnesses_)
 
             selected = random.sample(self.population, k=2)
             first_gene, second_gene = selected
@@ -63,39 +55,18 @@ class Genetic:
 
             # Mutation
             mutated_pop = self.mutate(crossover_pop, 1)
-            # print(mutated_pop)
             # Put back into population if it increases fitness
             pop.extend(mutated_pop)
-            # print(pop)
             assert len(pop) == len(self.population)
 
-            # pop_fitness = self.fittness(pop)
-            # initial_fitness = self.fittness(self.population)
             pop_fitnesses = [(idx, self.fittness([individual])) for idx, individual in enumerate(pop)]
             pop_fitnesses = sorted(pop_fitnesses, key=operator.itemgetter(1), reverse=True)
             pop_most_fit = pop_fitnesses[0][1]
             if pop_most_fit >= most_fit:
                 self.population = copy.deepcopy(pop)
 
-            # if pop_fitness > initial_fitness:
-            #     self.population = pop
-            #     fitnesses.append(pop_fitness)
-            # self.population = pop
-            # fitnesses.append(self.fittness(self.population))
-            # else:
-            #     self.population = self.population
-            #     fitnesses.append(self.fittness(self.population))
-            # fitnesses.append(0)
-            # pass
-            # fitnesses.append(self.fittness(self.population))
-
-            # print(fitnesses)
-        # print(sum(fitnesses))
-        # print(fitnesses)
-
         new_pop_fitness = [(self.fittness([individual]), individual) for individual in self.population]
         new_pop_fitness = sorted(new_pop_fitness, key=operator.itemgetter(0), reverse=True)
-        #print(f"Best Solution: {new_pop_fitness[1]}")
         self.best_combination = new_pop_fitness[0][1]
         self.best_value = np.dot(self.best_combination, self.profits)
 
@@ -108,8 +79,6 @@ class Genetic:
         plt.close()
 
         return fitnesses  # , self.population
-
-        # Check
 
     def mutate(self, genes: list, prob: float) -> list:
         """
@@ -138,7 +107,8 @@ class Genetic:
         # print("First gene, ", [sec_gene, first_gene])
         return [first_gene, sec_gene]
 
-    def crossover(self, genes: list, probability: int) -> list:
+    @staticmethod
+    def crossover(genes: list, probability: float) -> list:
 
         assert len(genes) == 2, "The number of genes needed should be 2"
 
@@ -155,12 +125,9 @@ class Genetic:
     def get_pop(self):
         return self.population
 
-# data = {"problem1" : {"weights": ,}}
 
 if __name__ == "__main__":
     gen = Genetic(p8["weights"], p8["profits"], capacity=p8["capacity"])
-    gen.loop(100000)
+    gen.loop(2000)
     print(f"Best Solution: {gen.best_combination}, Best Value: {gen.best_value}")
-    # print("hELLO WRD")
-    print(f"Actual Solution: {p8['optimal']}, Actual Value: {p8['best']}")
-    # print(problems)
+    print(f"Actual Solution: {p8['optimal']}, Actual best: {p8['best']}")
